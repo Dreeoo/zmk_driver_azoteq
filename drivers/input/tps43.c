@@ -568,6 +568,44 @@ static int tps43_configure_device(const struct device *dev) {
     }
     LOG_INF("Настройки фильтров установлены: 0x%02X", config->filter_settings);
 
+    // конфигурация частоты отчётов: задаём активный, idle-touch и idle режимы
+    // одинаково быстрыми, чтобы медленные движения не использовали медленный
+    // report rate (устранение рывков при медленном перемещении пальца).
+    if (config->report_rate_ms > 0) {
+        ret = tps43_i2c_write_reg16(dev, TPS43_REG_REPORT_RATE_ACTIVE, config->report_rate_ms);
+        if (ret == 0) {
+            ret = tps43_i2c_write_reg16(dev, TPS43_REG_REPORT_RATE_IDLE_TOUCH, config->report_rate_ms);
+        }
+        if (ret == 0) {
+            ret = tps43_i2c_write_reg16(dev, TPS43_REG_REPORT_RATE_IDLE, config->report_rate_ms);
+        }
+        if (ret != 0) {
+            LOG_WRN("Ошибка записи частоты отчётов: %d", ret);
+            return ret;
+        }
+        LOG_INF("Частота отчётов установлена: %d мс", config->report_rate_ms);
+    }
+
+    // конфигурация разрешения XY: аппаратное усиление координат без
+    // программного умножения (меньше дрожания при высокой скорости курсора).
+    if (config->x_resolution > 0) {
+        ret = tps43_i2c_write_reg16(dev, TPS43_REG_X_RESOLUTION, config->x_resolution);
+        if (ret != 0) {
+            LOG_WRN("Ошибка записи разрешения X: %d", ret);
+            return ret;
+        }
+    }
+    if (config->y_resolution > 0) {
+        ret = tps43_i2c_write_reg16(dev, TPS43_REG_Y_RESOLUTION, config->y_resolution);
+        if (ret != 0) {
+            LOG_WRN("Ошибка записи разрешения Y: %d", ret);
+            return ret;
+        }
+    }
+    if (config->x_resolution > 0 || config->y_resolution > 0) {
+        LOG_INF("Разрешение установлено: X=%d Y=%d", config->x_resolution, config->y_resolution);
+    }
+
     // установка признака завершения конфигурации
     ret = tps43_i2c_write_reg8(dev, TPS43_REG_SYSTEM_CONFIG_0, TPS43_SETUP_COMPLETE);
     if (ret != 0) {
@@ -765,6 +803,9 @@ static int tps43_init(const struct device *dev) {
         .scroll_sensitivity = DT_INST_PROP_OR(inst, scroll_sensitivity, 50),                         \
         .enable_power_management = DT_INST_PROP_OR(inst, enable_power_management, true),             \
         .filter_settings = DT_INST_PROP_OR(inst, filter_settings, 0x0F),                             \
+        .report_rate_ms = DT_INST_PROP_OR(inst, report_rate_ms, 10),                                 \
+        .x_resolution = DT_INST_PROP_OR(inst, x_resolution, 2048),                                   \
+        .y_resolution = DT_INST_PROP_OR(inst, y_resolution, 1792),                                   \
     };                                                                                               \
                                                                                                      \
     DEVICE_DT_INST_DEFINE(inst, tps43_init, NULL, &tps43_##inst##_drvdata, &tps43_##inst##_config,   \

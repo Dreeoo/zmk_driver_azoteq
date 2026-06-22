@@ -59,6 +59,17 @@ extern "C" {
 // Чтение-запись
 #define TPS43_REG_FILTER_SETTINGS   0x0632  /* 1 байт */
 
+/* Частота отчётов (report rate), значение в миллисекундах */
+// Чтение-запись // адреса по карте памяти IQS5xx-B000
+#define TPS43_REG_REPORT_RATE_ACTIVE      0x057A  /* 2 байта */
+#define TPS43_REG_REPORT_RATE_IDLE_TOUCH  0x057C  /* 2 байта */
+#define TPS43_REG_REPORT_RATE_IDLE        0x057E  /* 2 байта */
+
+/* Разрешение XY (resolution) — аппаратное усиление координат */
+// Чтение-запись
+#define TPS43_REG_X_RESOLUTION            0x066E  /* 2 байта */
+#define TPS43_REG_Y_RESOLUTION            0x0670  /* 2 байта */
+
 
 /* ============================================================ */
 /* Системная информация 0 (0x000F) - Флаги состояния - 8 бит */
@@ -173,6 +184,10 @@ struct tps43_config {
     bool enable_power_management;
 
     uint8_t filter_settings;
+
+    uint16_t report_rate_ms;
+    uint16_t x_resolution;
+    uint16_t y_resolution;
 };
 
 struct tps43_drv_data {
