@@ -2,122 +2,122 @@ properties:
   rdy-gpios:
     type: phandle-array
     required: false
-    description: GPIO пин для сигнала прерывания RDY (Ready)
+    description: GPIO pin for the RDY (Ready) interrupt signal
 
   rst-gpios:
     type: phandle-array
     required: false
-    description: GPIO пин для сигнала сброса RST (Reset)
+    description: GPIO pin for the RST (Reset) signal
 
   filter-settings:
     type: int
     default: 0x0F
     description: |
-      Определения битов:
-      - Бит 0 (0x01): IIR-фильтр - фильтр с бесконечной импульсной характеристикой для
-        сглаживание координат. Уменьшает высокочастотный шум и дрожание.
-      - Бит 1 (0x02): MAV-фильтр - фильтр скользящего среднего для определения координат
-        стабилизация. Удаляет выбросы и усредняет последние измерения.
-      - Бит 2 (0x04): Выбор IIR - При установке используется фиксированный коэффициент IIR.
-        Если флажок снят (по умолчанию), используется динамический IIR, который адаптируется к скорости движения.
-      - Бит 3 (0x08): Фильтр подсчета ALP - Адаптивный фильтр процесса обучения
-        для подавления шума. Отфильтровывает нежелательные события касания на основе изученных шаблонов.
-      
-      Общие конфигурации:
-      - 0x0B: включены IIR + MAV + ALP, динамический IIR.
-        Хороший баланс стабильности и отзывчивости.
-      - 0x0F (по умолчанию): Включены все фильтры, включая фиксированный выбор IIR.
-        Максимальное сглаживание, может привести к увеличению задержки.
-      - 0x03: только IIR + MAV. Базовое сглаживание без фильтрации ALP.
-      - 0x01: только IIR. Минимальная фильтрация, наименьшая задержка.
-      - 0x00: Все фильтры отключены. Исходные данные датчика могут содержать помехи.
-      
-      Значения могут быть объединены с помощью побитового ИЛИ (например, 0x01 | 0x02 = 0x03).
+      Bit definitions:
+      - Bit 0 (0x01): IIR filter - infinite impulse response filter for
+        coordinate smoothing. Reduces high-frequency noise and jitter.
+      - Bit 1 (0x02): MAV filter - moving average filter for coordinate
+        stabilization. Removes outliers and averages the most recent samples.
+      - Bit 2 (0x04): IIR select - When set, a fixed IIR coefficient is used.
+        When cleared (default), a dynamic IIR is used that adapts to the movement speed.
+      - Bit 3 (0x08): ALP count filter - Adaptive learning process filter
+        for noise suppression. Filters out unwanted touch events based on learned patterns.
+
+      Common configurations:
+      - 0x0B: IIR + MAV + ALP enabled, dynamic IIR.
+        A good balance of stability and responsiveness.
+      - 0x0F (default): All filters enabled, including the fixed IIR select.
+        Maximum smoothing, may increase latency.
+      - 0x03: IIR + MAV only. Basic smoothing without ALP filtering.
+      - 0x01: IIR only. Minimal filtering, lowest latency.
+      - 0x00: All filters disabled. Raw sensor data may contain noise.
+
+      Values can be combined with a bitwise OR (for example, 0x01 | 0x02 = 0x03).
 
   sensitivity:
     type: int
     required: false
     default: 100
-    description: Процент чувствительности касания (100 = нормальная, больше = более чувствительная)
+    description: Touch sensitivity percentage (100 = normal, higher = more sensitive)
 
   scroll-sensitivity:
     type: int
     required: false
     default: 50
-    description: Процент чувствительности прокрутки (50 = нормальная, больше = более чувствительная)
+    description: Scroll sensitivity percentage (50 = normal, higher = more sensitive)
 
   report-rate-ms:
     type: int
     required: false
     default: 10
     description: |
-      Период отчётов (мс) для активного, idle-touch и idle режимов. 10 = 100 Гц.
-      Задаётся одинаково для всех режимов, чтобы медленные движения не использовали
-      медленный report rate (устранение рывков). 0 = оставить значение по умолчанию чипа.
+      Report period (ms) for the active, idle-touch, and idle modes. 10 = 100 Hz.
+      Set identically for all modes so that slow movements do not use the
+      slow report rate (eliminates stutter). 0 = keep the chip's default value.
 
   x-resolution:
     type: int
     required: false
     default: 2048
     description: |
-      Аппаратное разрешение по оси X. Больше = быстрее курсор без программного
-      усиления (меньше дрожания). 0 = оставить значение по умолчанию чипа.
+      Hardware resolution along the X axis. Higher = faster cursor without software
+      gain (less jitter). 0 = keep the chip's default value.
 
   y-resolution:
     type: int
     required: false
     default: 1792
     description: |
-      Аппаратное разрешение по оси Y. Больше = быстрее курсор без программного
-      усиления (меньше дрожания). 0 = оставить значение по умолчанию чипа.
+      Hardware resolution along the Y axis. Higher = faster cursor without software
+      gain (less jitter). 0 = keep the chip's default value.
 
   enable-power-management:
     type: boolean
     required: false
-    description: Включить автоматическое управление питанием (приостановка/возобновление)
+    description: Enable automatic power management (suspend/resume)
 
   single-tap:
     type: boolean
     required: false
-    description: Включить жест одиночного касания
+    description: Enable the single-tap gesture
 
   two-finger-tap:
     type: boolean
     required: false
-    description: Включить жест касания двумя пальцами
+    description: Enable the two-finger tap gesture
 
   scroll:
     type: boolean
     required: false
-    description: Включить жест прокрутки
+    description: Enable the scroll gesture
 
   swipes:
     type: boolean
     required: false
-    description: Включить обработку свайпов. При включении отслеживаются свайпы тремя пальцами
+    description: Enable swipe handling. When enabled, three-finger swipes are tracked
 
   switch-xy:
     type: boolean
     required: false
-    description: Поменять местами оси X и Y
+    description: Swap the X and Y axes
 
   press-and-hold:
     type: boolean
     required: false
-    description: Включить жест нажатия и удержания
+    description: Enable the press-and-hold gesture
 
   invert-x:
     type: boolean
-    description: Если присутствует, инвертировать значения координаты X.
-      
+    description: If present, invert the X coordinate values.
+
   invert-y:
     type: boolean
-    description: Если присутствует, инвертировать значения координаты Y.
-      
+    description: If present, invert the Y coordinate values.
+
   invert-scroll-x:
     type: boolean
-    description: Если присутствует, инвертировать значения скролла по X.
-            
+    description: If present, invert the scroll values along X.
+
   invert-scroll-y:
     type: boolean
-    description: Если присутствует, инвертировать значения скролла по Y.
+    description: If present, invert the scroll values along Y.
